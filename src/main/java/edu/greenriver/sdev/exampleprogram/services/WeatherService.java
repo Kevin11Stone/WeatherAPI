@@ -1,30 +1,37 @@
 package edu.greenriver.sdev.exampleprogram.services;
 
+import edu.greenriver.sdev.exampleprogram.db.iWeatherReadingRepository;
 import edu.greenriver.sdev.exampleprogram.model.WeatherReading;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class WeatherService {
 
+    // this is a spring bean, I can also use dependency injection here
+    private iWeatherReadingRepository repo;
+
+    public WeatherService(iWeatherReadingRepository repo) {
+        this.repo = repo;
+    }
+
     public List<WeatherReading> getAllReadings()
     {
-        return List.of(
-                new WeatherReading("10/10/23 9 p.m.", "Lakewood", "Rainy", 70.0),
-                new WeatherReading("10/11/23 9 p.m.", "Olympia", "Foggy", 52.0),
-                new WeatherReading("10/12/23 7 p.m.", "Tacoma", "Sunny", 61.0),
-                new WeatherReading("10/13/23 6 p.m.", "South Tacoma", "Cloudy", 65.0)
-
-        );
+        return repo.findAll();
     }
 
     public List<Double> getAllTemps()
     {
-        return List.of(
-                70.0, 24.8, 66.8, 68.0
-        );
-    }
+        // give me all of the db records
+        List<WeatherReading> readings = repo.findAll();
+        List<Double> temps = new ArrayList<>();
 
+        for (WeatherReading reading : readings) {
+            temps.add(reading.getTempFaren());
+        }
+        return temps;
+    }
 
 }
